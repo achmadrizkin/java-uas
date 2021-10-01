@@ -26,6 +26,7 @@ public class ListItemEventAdapter extends RecyclerView.Adapter<ListItemEventAdap
         notifyDataSetChanged();
     }
 
+
     @NonNull
     @Override
     public ListItemEventViewHolder onCreateViewHolder(@NonNull ViewGroup parent, int viewType) {

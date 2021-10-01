@@ -1,15 +1,18 @@
 package com.rcyono.schedulereskul.network;
 
+import com.rcyono.schedulereskul.adapter.DeletePostResponse;
 import com.rcyono.schedulereskul.model.event.EventResponse;
 import com.rcyono.schedulereskul.model.schedule.ScheduleResponse;
 import com.rcyono.schedulereskul.model.type.TypeResponse;
 import com.rcyono.schedulereskul.model.user.UserResponse;
 
 import retrofit2.Call;
+import retrofit2.http.DELETE;
 import retrofit2.http.Field;
 import retrofit2.http.FormUrlEncoded;
 import retrofit2.http.GET;
 import retrofit2.http.POST;
+import retrofit2.http.Query;
 
 public interface ApiService {
 
@@ -48,4 +51,7 @@ public interface ApiService {
 
     @GET("type/type_eskul.php")
     Call<TypeResponse> getTypeEskul();
+
+    @DELETE("posts.php?function=delete_posts")
+    Call<DeletePostResponse> deletePost(@Query("id") String id);
 }
