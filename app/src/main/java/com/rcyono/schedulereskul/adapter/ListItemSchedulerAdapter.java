@@ -22,12 +22,14 @@ import com.rcyono.schedulereskul.ui.home.ScheduleAdapterActionListener;
 
 import java.util.ArrayList;
 
+import static java.lang.Integer.parseInt;
+
 public class ListItemSchedulerAdapter extends RecyclerView.Adapter<ListItemSchedulerAdapter.ListItemSchedulerViewHoler> {
     private final ArrayList<Schedule> listScheduler = new ArrayList<>();
     private final ScheduleAdapterActionListener actionListener1;
 
-    public ListItemSchedulerAdapter(ScheduleAdapterActionListener actionListener){
-        this.actionListener1 = actionListener;
+    public ListItemSchedulerAdapter(ScheduleAdapterActionListener actionListener1){
+        this.actionListener1 = actionListener1;
     }
 
     public void setAdapter(ArrayList<Schedule> schedulers) {
@@ -59,8 +61,7 @@ public class ListItemSchedulerAdapter extends RecyclerView.Adapter<ListItemSched
         private final ImageView ivVert;
         private final ScheduleAdapterActionListener actionListener1;
 
-
-        public ListItemSchedulerViewHoler(@NonNull View itemView, ScheduleAdapterActionListener actionListener) {
+        public ListItemSchedulerViewHoler(@NonNull View itemView, ScheduleAdapterActionListener actionListener1) {
             super(itemView);
             tvType = itemView.findViewById(R.id.tv_title_type);
             tvDesc = itemView.findViewById(R.id.tv_desc);
@@ -69,7 +70,7 @@ public class ListItemSchedulerAdapter extends RecyclerView.Adapter<ListItemSched
             tvTime = itemView.findViewById(R.id.tv_time);
             ivIcon = itemView.findViewById(R.id.iv_icon_type);
             ivVert = itemView.findViewById(R.id.iv_vert);
-            this.actionListener1 = actionListener;
+            this.actionListener1 = actionListener1;
         }
 
         public void bind(Schedule scheduler) {
@@ -94,10 +95,12 @@ public class ListItemSchedulerAdapter extends RecyclerView.Adapter<ListItemSched
                         public boolean onMenuItemClick(MenuItem item) {
                             switch(item.getItemId()){
                                 case R.id.action_edit:
-//                                    actionListener.onClickEdit(scheduler);
+                                    actionListener1.onClickEdit(scheduler);
                                     return true;
                                 case R.id.action_delete:
-//                                    actionListener.onClickDelete(scheduler, getAbsoluteAdapterPosition());
+                                    //TODO: BENERIN yang ini cuy, ga bisa ngambil id yang pgn dihapus
+                                    actionListener1.onClickDelete(scheduler, parseInt(scheduler.getId()));
+                                    System.out.println( "ADAPTER POSITION: "+ getAdapterPosition());
                                     return true;
                                 default:
                                     return false;

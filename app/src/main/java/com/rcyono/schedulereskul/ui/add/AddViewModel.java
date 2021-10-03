@@ -74,6 +74,7 @@ public class AddViewModel extends ViewModel {
                 schedule.getTimeStart(),
                 schedule.getTimeEnd()
         );
+
         client.enqueue(new Callback<ScheduleResponse>() {
             @Override
             public void onResponse(@NonNull Call<ScheduleResponse> call, @NonNull Response<ScheduleResponse> response) {
@@ -94,4 +95,6 @@ public class AddViewModel extends ViewModel {
             }
         });
     }
+
+
 }

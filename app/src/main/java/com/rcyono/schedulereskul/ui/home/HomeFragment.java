@@ -1,12 +1,14 @@
 package com.rcyono.schedulereskul.ui.home;
 
 import android.content.DialogInterface;
+import android.content.Intent;
 import android.os.Bundle;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.ImageView;
 import android.widget.ProgressBar;
+import android.widget.Toast;
 
 import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
@@ -18,18 +20,26 @@ import androidx.recyclerview.widget.RecyclerView;
 import com.bumptech.glide.Glide;
 import com.google.android.material.dialog.MaterialAlertDialogBuilder;
 import com.rcyono.schedulereskul.R;
+import com.rcyono.schedulereskul.adapter.DeletePostResponse;
 import com.rcyono.schedulereskul.adapter.ListItemSchedulerAdapter;
 import com.rcyono.schedulereskul.adapter.SliderImageEventAdapter;
 import com.rcyono.schedulereskul.model.schedule.Schedule;
 import com.rcyono.schedulereskul.model.user.User;
+import com.rcyono.schedulereskul.network.ApiConfig;
+import com.rcyono.schedulereskul.network.ApiService;
 import com.rcyono.schedulereskul.preferences.AppPreferences;
+import com.rcyono.schedulereskul.ui.add.AddSchedulerFragment;
 import com.smarteist.autoimageslider.IndicatorView.animation.type.IndicatorAnimationType;
 import com.smarteist.autoimageslider.SliderAnimations;
 import com.smarteist.autoimageslider.SliderView;
 
 import java.util.ArrayList;
+import java.util.List;
 
 import cn.pedant.SweetAlert.SweetAlertDialog;
+import retrofit2.Call;
+import retrofit2.Callback;
+import retrofit2.Response;
 
 public class HomeFragment extends Fragment {
     private SweetAlertDialog alertDialog;
@@ -37,15 +47,12 @@ public class HomeFragment extends Fragment {
     private ImageView ivAvatar;
     private ProgressBar progressBar;
     private HomeFragment adapter;
-
     private SliderView sliderEventView;
     private SliderImageEventAdapter sliderImageEventAdapter;
-
     private ListItemSchedulerAdapter listItemSchedulerAdapter;
-
     private User user;
     public static int REQUEST_CODE_CREATE_UPDATE_SUCCESS = 200;
-
+    private final List<Schedule> postList = new ArrayList<>();
 
     @Override
     public View onCreateView(LayoutInflater inflater, ViewGroup container,
@@ -55,6 +62,8 @@ public class HomeFragment extends Fragment {
         rvSchedule = view.findViewById(R.id.rv_schedule);
         ivAvatar = view.findViewById(R.id.iv_avatar);
         progressBar = view.findViewById(R.id.progress_bar);
+
+
         return view;
     }
 
@@ -129,25 +138,24 @@ public class HomeFragment extends Fragment {
                 .into(ivAvatar);
     }
 
-//    @Override
-//    public void onClickEdit(Schedule post) {
-//        Intent intent = new Intent(getActivity(), MainActivity.class);
-//        startActivityForResult(intent, REQUEST_CODE_CREATE_UPDATE_SUCCESS);
-//    }
-//
-//    @Override
-//    public void onClickDelete(Schedule post, int absoluteAdapterPosition) {
-//        showPopupDelete(post, absoluteAdapterPosition);
-//    }
+
+    public void onClickDelete(Schedule post, int absoluteAdapterPosition) {
+        showPopupDelete(post, absoluteAdapterPosition);
+    }
+
+    public void onClickEdit(Schedule post) {
+        Intent intent = new Intent(getActivity(), AddSchedulerFragment.class);
+        startActivityForResult(intent, REQUEST_CODE_CREATE_UPDATE_SUCCESS);
+    }
 
     private void showPopupDelete(Schedule post, int absoluteAdapterPosition) {
         new MaterialAlertDialogBuilder(getContext())
                 .setTitle("Delete Post")
-                .setMessage("Are you sure to delete post \"" + post.getDesc() + "\"?")
+                .setMessage("Are you sure to delete post \"" )
                 .setPositiveButton("Delete", new DialogInterface.OnClickListener() {
                     @Override
                     public void onClick(DialogInterface dialogInterface, int i) {
-//                        deletePostFromServer(post, absoluteAdapterPosition);
+                        deletePostFromServer(post, absoluteAdapterPosition);
                         dialogInterface.dismiss();
                     }
                 })
@@ -160,26 +168,33 @@ public class HomeFragment extends Fragment {
                 .show();
     }
 
-//    private void deletePostFromServer(Schedule post, int absoluteAdapterPosition) {
-//        progressBar.setVisibility(View.VISIBLE);
-//        ApiService client = ApiConfig.createService(ApiService.class);
-//        client.deletePost(String.valueOf(post.getId())).enqueue(new Callback<DeletePostResponse>() {
-//            @Override
-//            public void onResponse(Call<DeletePostResponse> call, Response<DeletePostResponse> response) {
-//                progressBar.setVisibility(View.GONE);
-//                if (response.isSuccessful()) {
-//                    adapter.removePost(post, absoluteAdapterPosition);
-//                    Toast.makeText(getContext(), response.body().getMessage(), Toast.LENGTH_SHORT).show();
-//                } else {
-//                    Toast.makeText(getContext(), "Delete post is failed", Toast.LENGTH_SHORT).show();
-//                }
-//            }
-//
-//            @Override
-//            public void onFailure(Call<DeletePostResponse> call, Throwable t) {
-//                progressBar.setVisibility(View.GONE);
-//                Toast.makeText(getContext(), t.getLocalizedMessage(), Toast.LENGTH_SHORT).show();
-//            }
-//        });
-//    }
+    private void deletePostFromServer(Schedule post, int absoluteAdapterPosition) {
+        progressBar.setVisibility(View.VISIBLE);
+        ApiService client = ApiConfig.createService(ApiService.class);
+        client.deletePost(String.valueOf(post.getId())).enqueue(new Callback<DeletePostResponse>() {
+            @Override
+            public void onResponse(Call<DeletePostResponse> call, Response<DeletePostResponse> response) {
+                progressBar.setVisibility(View.GONE);
+                if (response.isSuccessful()) {
+                    adapter.removePost(post, absoluteAdapterPosition);
+                    Toast.makeText(getContext(), response.body().getMessage(), Toast.LENGTH_SHORT).show();
+                } else {
+                    Toast.makeText(getContext(), "Delete post is failed", Toast.LENGTH_SHORT).show();
+                }
+            }
+
+            @Override
+            public void onFailure(Call<DeletePostResponse> call, Throwable t) {
+                progressBar.setVisibility(View.GONE);
+                Toast.makeText(getContext(), t.getLocalizedMessage(), Toast.LENGTH_SHORT).show();
+            }
+        });
+    }
+
+
+    private void removePost(Schedule post, int absoluteAdapterPosition) {
+        this.postList.remove(post);
+//        this.notifyItemRemoved(absoluteAdapterPosition);
+    }
+
 }
